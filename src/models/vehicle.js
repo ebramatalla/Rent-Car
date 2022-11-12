@@ -8,12 +8,19 @@ const vehicleSchema = new mongoose.Schema({
   model: {
     type: String,
     required: true,
+    trim: true,
   },
-  name: {
-    type: String,
+  yearOfProduction: {
+    type: Number,
     required: true,
   },
-  Features: {
+
+  brand: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  features: {
     type: String,
     required: false,
   },
@@ -24,6 +31,7 @@ const vehicleSchema = new mongoose.Schema({
   },
   numberOfVehicle: {
     type: Number,
+    default: 0,
   },
 });
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);

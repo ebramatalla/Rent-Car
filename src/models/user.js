@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
-const validator = require("validator");
+const role = {
+  admin: "admin",
+  user: "user",
+};
 
 const userSchema = mongoose.Schema({
   name: {
@@ -12,6 +15,12 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true, // `email` must be unique
   },
+  role: {
+    type: String,
+    enum: role,
+    default: role.user,
+  },
+
   password: {
     type: String,
     require: true,

@@ -2,7 +2,7 @@ const express = require("express");
 const UserController = require("../controller/userController");
 const { body } = require("express-validator");
 
-const router = new express.Router();
+const router = express.Router();
 
 router.post(
   "/signup",
@@ -19,5 +19,28 @@ router.post(
     .isLength(7)
     .withMessage("Password must Be > 7 String"),
   UserController.addUser
+);
+router.patch(
+  "/edit/:id",
+  body("name")
+    .isString()
+    .optional()
+    .withMessage("Name Is Required and must be string"),
+  body("email")
+    .isEmail()
+    .optional()
+    .withMessage("Email is Required and must be valid "),
+  body("password")
+    .isString()
+    .optional()
+    .custom((value, { req }) => {
+      if (value.toLowerCase().includes(req.body.name)) {
+        throw new Error("password mustn't contain name ");
+      }
+      return true;
+    })
+    .isLength(7)
+    .withMessage("Password must Be > 7 String"),
+  UserController.updateUser
 );
 module.exports = router;

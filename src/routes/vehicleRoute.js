@@ -4,9 +4,14 @@ const { body, param } = require("express-validator");
 const Vehicle = require("../models/vehicle");
 
 const vehicleController = require("../controller/vehicleController");
+const isAuth = require("../middleware/isAuth");
+const isRole = require("../middleware/isRole");
+const { Roles } = require("../models/user");
 // Add Vehicle
 route.post(
   "/addVehicle",
+  isAuth,
+  isRole([Roles.admin]),
   body("model").isString().withMessage("Model is required"),
 
   body("yearOfProduction")
@@ -28,6 +33,9 @@ route.post(
 // rent car
 route.post(
   "/rent/:id",
+  isAuth,
+  isRole([Roles.user]),
+
   param("id")
     .isMongoId()
     .custom(async (value, { req }) => {

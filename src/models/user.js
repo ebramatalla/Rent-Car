@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 var uniqueValidator = require("mongoose-unique-validator");
 const role = {
@@ -34,7 +36,28 @@ const userSchema = mongoose.Schema({
       }
     },
   },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 });
+
+userSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { error: "User Not Found" };
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return { error: "Incorrect Password" };
+  }
+  return user;
+};
+
 userSchema.pre("save", async function (next) {
   const user = this;
   if (user.isModified("password")) {
@@ -42,7 +65,20 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
+
+userSchema.methods.generateToken = async function () {
+  const user = this;
+  const token = await jwt.sign(
+    { _id: user._id.toString() },
+    process.env.TOKEN_KEY
+  );
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
+
 const User = mongoose.model("User", userSchema);
 userSchema.plugin(uniqueValidator);
 
 module.exports = User;
+module.exports.Roles = role;

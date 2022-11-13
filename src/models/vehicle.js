@@ -31,7 +31,7 @@ const vehicleSchema = new mongoose.Schema({
   },
   numberOfVehicle: {
     type: Number,
-    default: 0,
+    default: 1,
   },
 });
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);

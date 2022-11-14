@@ -37,7 +37,7 @@ const vehicleSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-  costPerDay: {
+  costPerHour: {
     type: Number,
     required: true,
   },

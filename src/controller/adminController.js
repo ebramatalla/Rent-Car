@@ -1,6 +1,33 @@
 const Vehicle = require("../models/vehicle");
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
+const { Roles } = require("../models/user");
+
+const getAllUsers = async (req, res) => {
+  try {
+    const allUser = await User.find({ role: "user" });
+    return res.send(allUser);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+const getAllVehicle = async (req, res) => {
+  try {
+    const { role } = req.user;
+    let query = {};
+    switch (role) {
+      case Roles.admin:
+        query = {};
+        break;
+      case Roles.user:
+        query = { numberOfAvailableVehicle: { $gt: 0 } };
+    }
+    const allVehicle = await Vehicle.find(query);
+    return res.send(allVehicle);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
 
 const addVehicle = async (req, res) => {
   try {
@@ -33,4 +60,31 @@ const addVehicle = async (req, res) => {
   }
 };
 
-module.exports = { addVehicle };
+const getReturnCode = async (req, res) => {
+  try {
+    console.log(req.body);
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      throw new Error("This Email is Invalid");
+    }
+    if (!user.currentCar) {
+      throw new Error("This Email haven't Car");
+    }
+    const vehicle = await Vehicle.findById(user.currentCar);
+    user.endRent = new Date();
+    // get Time Of Hour
+    timeOfRent = Math.abs(user.startRent - user.endRent) / 3600000;
+
+    Cost = timeOfRent * vehicle.costPerHour;
+
+    await user.save();
+
+    res.send({
+      Code: user.returnCode,
+      Cost,
+      timeOfRent: "You Rent Car For " + timeOfRent + " Hour",
+    });
+  } catch (error) {}
+};
+
+module.exports = { getAllUsers, addVehicle, getReturnCode, getAllVehicle };

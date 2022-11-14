@@ -7,6 +7,20 @@ const isRole = require("../middleware/isRole");
 const { Roles } = require("../models/user");
 const adminController = require("../controller/adminController");
 
+// get all user
+route.get(
+  "/allUsers",
+  isAuth,
+  isRole([Roles.admin]),
+  adminController.getAllUsers
+);
+// Get All Vehicle
+route.get(
+  "/allVehicles",
+  isAuth,
+  isRole([Roles.admin, Roles.user]),
+  adminController.getAllVehicle
+);
 // Add Vehicle
 route.post(
   "/addVehicle",
@@ -27,8 +41,14 @@ route.post(
   body("brand").isString().withMessage("brand is required"),
 
   body("vehicleType").isString().withMessage("vehicleType is required"),
-  body("costPerDay").isNumeric().withMessage("Cost  is required"),
+  body("costPerHour").isNumeric().withMessage("Cost  is required"),
 
   adminController.addVehicle
+);
+route.get(
+  "/getCode",
+  isAuth,
+  isRole([Roles.admin]),
+  adminController.getReturnCode
 );
 module.exports = route;

@@ -52,6 +52,12 @@ const userSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Vehicle",
   },
+  startRent: {
+    type: Date,
+  },
+  endRent: {
+    type: Date,
+  },
 });
 
 userSchema.statics.findByCredentials = async (email, password) => {

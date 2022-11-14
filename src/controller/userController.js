@@ -55,7 +55,7 @@ const rentVehicle = async (req, res) => {
     req.user.returnCode = random();
 
     req.user.currentCar = vehicle._id;
-
+    req.user.startRent = new Date();
     await vehicle.save();
     await req.user.save();
     res.status(200).send({ message: "Rent ", vehicle });
@@ -83,6 +83,8 @@ const returnCar = async (req, res) => {
     }
 
     req.user.currentCar = null;
+    req.user.startRent = null;
+    req.user.endRent = null;
     vehicle.numberOfAvailableVehicle = vehicle.numberOfAvailableVehicle + 1;
     await vehicle.save();
     await req.user.save();

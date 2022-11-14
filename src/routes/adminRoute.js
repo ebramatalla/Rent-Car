@@ -2,11 +2,11 @@ const express = require("express");
 const route = express.Router();
 const { body, param } = require("express-validator");
 const Vehicle = require("../models/vehicle");
-
-const vehicleController = require("../controller/vehicleController");
 const isAuth = require("../middleware/isAuth");
 const isRole = require("../middleware/isRole");
 const { Roles } = require("../models/user");
+const adminController = require("../controller/adminController");
+
 // Add Vehicle
 route.post(
   "/addVehicle",
@@ -27,24 +27,8 @@ route.post(
   body("brand").isString().withMessage("brand is required"),
 
   body("vehicleType").isString().withMessage("vehicleType is required"),
+  body("costPerDay").isNumeric().withMessage("Cost  is required"),
 
-  vehicleController.addVehicle
-);
-// rent car
-route.post(
-  "/rent/:id",
-  isAuth,
-  isRole([Roles.user]),
-
-  param("id")
-    .isMongoId()
-    .custom(async (value, { req }) => {
-      const vehicle = await Vehicle.findById(value);
-      if (!vehicle) {
-        throw new Error("This vehicle Is Invalid");
-      }
-      return true;
-    }),
-  vehicleController.rentVehicle
+  adminController.addVehicle
 );
 module.exports = route;
